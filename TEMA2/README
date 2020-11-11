@@ -1,0 +1,174 @@
+Nicu Andreea
+311AB
+
+		TEMA2 - Marele arhipelag Eao-Zinci 🌴
+
+
+	Descriere
+
+Arhipelagul Eao-Zinci din Orientul Indepartat ​este in plina dezvoltare. Fiecare
+insula din arhipelag produce zilnic o serie de resurse. Acestea sunt folosite 
+local si/sau distribuite catre alte insule folosind flota aeriană Eao-Zinci.Rutele
+de transport sunt configurate in fiecare dimineata pentru a asigura distribuția
+optimă a resurselor.
+Intrand in era automatizării, conducatorii arhipelagului doresc sa ​ treacă la 
+următorul pas si să poata sa-si distribuie resursele in cel mai eficient mod posibil.
+Mai mult, pentru a elimina potențialele conflicte in ce privește accesul la flota
+aeriana, in fiecare seara, avioanele sunt redistribuite între insule.	
+
+
+	Utilizare            
+
+Pentru compilarea si executarea cu succes a programului sunt necesare versiunile
+de linux ale programelor:
+-> gcc
+-> make
+Astfel, programul poate va fi compilat folosind comanda "make" care va apela
+regula build si clean. Programul este rulat rulat folosind sintaxa "./avion 
+date.in rezultate.out".
+
+
+	Structura
+
+Structura programului este realizată folosind fișier header (Tema2.h) și 
+sursă (Tema2.c). Metodele implementate sunt testate în fișierul main.c. Structurile
+de date folosite, "Resusra", "Island", "Graph" au fost declarate in "Tema1.h",
+alaturi de funtiile implementate in "Tema1.c".
+
+
+	Implementare solutie
+
+Tematica problemei secventioneaza solutionarea acesteia in 3 etape:
+1. Proiectare
+2. Analiza
+3. Gestiune
+
+Input-ul problemei este reprezentat de un numar de insule, fiecare dintre acestea
+avand un numar de resurse, aflate intr-o anumita cantitate. Citirea datelor este
+realizata prin intermediul urmatoarelor functii:
+->alocare_Resursa: se aloca memorie vectorului de resurse
+->citire_Resursa : sunt citite datele specifice - nume resursa (alocare dinamica)
+						- cantitate resursa
+->alocare_Island : se aloca memorie vectorului de insule
+->citire_Island  : sunt citite datele specifice - nume insula (alocare dinamica) 
+						- numarul de resurse existent 
+Functiile corespunzatoare alocarii de memorie si de citire pentru resurse sunt 
+apelate in "citire_Island". Astfel, in urma executiei acestor subprograme, se 
+creeaza vectorul de insule, *island, fiecare insula avand un vector de resurse,
+*inventarResurse, de tip Resursa.
+
+Intre insule exista legaturi, iar deplasarea necesita un anumit timp de zbor.
+In acest sens, se va crea un graf neorientat, intrucat conexiunea dintre
+insula X si insula Y implica existenta atat a zborului care duce din X in Y, 
+cat si unuia care duce din Y in X. De asemenea, graful este ponderat.
+Crearea grafului este realizata in functia "Graph_island *create":
+ - se cunoaste numarul de insule
+ - se aloca memorie pentru matricea costurilor
+ - se citesc din fisierul text insulele intre care exita legarura si durata de 
+   zbor dintre cele doua
+ - plasarea timpului se realizeaza pe linia i, coloana j (si invers), corespunzatoare
+   indexului fiecarei insule din care se scade o unitate, astfel incat inceputul sa
+   fie din 0, prin functia de convertire "atoi"
+
+Etapa de proiectare
+
+Fiecarei cerinte ii corespunde o functie de rezolvare:
+
+Conexiune IslandX IslandY
+->functia "conexiune" verifica deca exista conexiune directa intre doua insule;
+  daca in matricea drumului exista timp intre cele 2 insule, atunci exista 
+  legatura intre acestea
+
+Legatura IslandX
+->functia "legatura" verifica daca exista​ legatura directa​ intre insula X cu 
+  celelate insule din arhipelag; daca pe linia corespunzatoare insulei primite 
+  ca parametru exista valori diferite de 0, atunci sunt afisate insulele respective
+
+Adauga_zbor IslandX IslandY cost
+->functia "adauga_zbor" adauga un ​drum direct de durata ​cost(z)​ intre Insula X
+  si Insula Y, transmise ca parametrii
+
+Max_resurse
+->functia "max_resurse" afiseaza numarul de resurse distincte de pe tot arhipelagul,
+  urmat de numele resurselor separate printr-un spatiu in ordine lexicografica;
+  se creeaza un vector de siruri de caractere in care sunt adaugate numele 
+  resurselor; daca nu exista nicio resursa in vector, atunci se adauga prima
+  resursa gasita, apoi se adauga in continuare resurse in vector, verificandu-se 
+  daca acestea au fost sau nu introduse; in caz afirmativ, resursa respectiva
+  nu va mai fi introdusa, variablia "gasit" tinand evidenta acestui lucru;
+  odata cu adaugarea unei resurse in vector variabila "nr" (numarul total de 
+  resurse din vector) se incrementeaza cu o unitate;
+  dupa ce vectorul a fost creat, se sorteaza lexicografic numele resurselor
+
+Max_cantitate resursa
+->functia "max_cantitate" afiseaza insula (insulele) cu cantitatea cea mai mare
+  de resursa disponibila; resursa in cantitatea cea mai mare este transmisa
+  ca parametru; se parcurg resursele fiecarei insule, iar atunci cand numele
+  resurselor parcurse coincide cu cel aflat in fisierul de date se verifica
+  daca cantitatea acesteia este mai mare decat cea existenta; in caz afirmativ,
+  "mx" va lua valoarea respectiva; se parcurg din nou resursele fiecarei insule,
+  iar daca valoarea maxima gasita are aceeasi cantitate cu aceeasi resursa a altei
+  insule, atunci se vor afisa insulele respective
+
+Etapa de analiza
+
+Aceasta etapa urmareste dezvoltarea unor algoritmi pentru determinarea eficienta
+a drumurilor, respectiv timpului intre doua insule. Astfel, algoritmul de baza
+apelat este implementat in functia "Dijkstra", care calculeaza drumul minim de
+la un nod la toate celelalte noduri, pornind de la matricea costurilor.
+Algoritmul lui Dijkstra este implementat astfel incat sa tina evidenta predecesorilor 
+pentru a putea recupera calea de cost minim de la varful sursa la fiecare alt varf
+Implementarea acestuia este realizata in felul urmator:
+->se utilizeaza 3 vectori: 
+  - D  : retine pentru fiecare nod valoarea costului / drumul
+  - T  : vectorul parinte / predecesori
+  - viz: cu valori de 1 si 0; daca nodul a fost sau nu vizitat
+->se stabileste nodul de plecare si de contruieste vectorul 
+  - D cu valori din matricea costurilor de pe linia nodului de plecare
+  - T daca exista muchie intre nodul de plecare si celelalte noduri
+  - viz, nodul de plecare este singurul vizitat
+->de n- 1 ori este selectata valoarea minima dintre cele nevizitate din vectorul
+  D si se considera acel nod ca viitor nod de plecare
+ 
+Drum_zbor IslandX IslandY
+->functia "drum_zbor" afiseaza drumul cel mai scurt (din punct de vedere al duratei)
+  de la Insula X la Insula Y. Afisarea va fi de la prima insula intermediara
+  pana la insula destinatie, Insula Y; daca exista predecsori in vectorul T al 
+  insulei, atunci functia este apelata recursiv pentru a fi afisate insulele care
+  formeaza drumul minim; daca nu exista predecesori, atunci nu exista drum intre
+  cele 2 insule si se afiseaza majesaul "NO"
+
+Timp_zbor IslandX IslandY
+->functia "timp_zbor "afiseaza durata minima in conditii de distribuire instanta;
+  timpul minim este recuperat din vectorul D
+
+Min_zbor IslandX IslandY
+->functia "min_zbor" afiseaza durata minima in conditiile in care se adauga
+  stationari pe insulele intermediare pana la Insula Y; daca exista predecesori
+  atunci se aduga timpul de stationare (+15) pentru fiecare insula care terermina
+  drumul minim, prin apelarea recursiva a functiei
+
+Etapa de gestiune
+
+Se citesc datele din fisierul de intrare. Astfel, s-au utilizat urmatoarele functii:
+->alocare_matrice: se aloca memorie matricei de adiacenta
+->citire_matrice : se citeste matricea de adiacenta
+->citire_bkt     : sunt citite nr de insule, toleranta, nr de avioane pentru 
+		   fiecare insula si vectorul de avioane pt fiecare insula; 
+		   se apeleaza functiile de alocare si citire matrice
+Cazul 1: functia "nr_caz1" verifica daca nr de avioane al fiecarei insule este mai
+	 mare decat toleranta; atunci nu se va distrbui niciun avion, iar functia
+	 "afisare_avioane" printeaza input-ul de la cerinta curenta 
+Cazul 2: functia "nr_caz2" verifica daca exista un numar prea mare de avioane, 
+	 iar problema nu poate fi rezolvata si se afiseaza mesajul "Stack overflow!";
+	 se calculeaza numarul total de avioane, iar daca acesta depaseste produsul
+	 dintre numarul de insule si toleranta avioanelor, distribuirea nu este 
+	 posibila
+
+Functia "cerinte" apeleaza cerintele celor 3 etape. In cazul primelor doua se citesc
+datele de intrare pana la terminarea fisierului (in cazul testelor 1-8 si, respectiv,
+pana la intalnirea primei linii care contine doar o valoare intreaga in cazul 
+testelor 9-14). Se aloca memorie variabilei de tip char "cerinte", iar in loop-ul
+"do - while" se citeste cat timp exista date in fisierul text; functia "strcmp" 
+verifica daca este egal sirul de caractere dpdv lexizografic din fisier cu cel
+citit, apoi este rezolvata functia apelata.
